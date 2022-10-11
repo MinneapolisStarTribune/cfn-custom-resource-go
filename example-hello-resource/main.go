@@ -1,12 +1,3 @@
-# cfn-custom-resource-go
-A Go library for implementing CloudFormation custom resources
-
-## Quick start
-```shell
-go get github.com/MinneapolisStarTribune/cfn-custom-resource-go@latest
-```
-
-```go
 package main
 
 import (
@@ -58,5 +49,3 @@ func main() {
 		}
 	}
 }
-```
-
