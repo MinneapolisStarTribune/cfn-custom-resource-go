@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 // Response represents the result of processing a Request.
@@ -123,6 +125,14 @@ func (resp *Response) Sensitive() *Response {
 //		return r.FailureResponse("not implemented yet").Send()
 //	}
 func (resp *Response) Send() error {
+	if resp.PhysicalResourceId == "" {
+		if resp.Status == "FAILED" {
+			// In a failed response situation, we can fill in a placeholder
+			resp.PhysicalResourceId = resp.LogicalResourceId + "-failed-" + strconv.Itoa(int(time.Now().Unix()))
+		} else {
+			return fmt.Errorf("no physical resource id in response")
+		}
+	}
 	body, err := json.Marshal(resp)
 	if err != nil {
 		return fmt.Errorf("could not marshal Response: %w", err)
