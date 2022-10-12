@@ -130,7 +130,7 @@ func (resp *Response) Send() error {
 	if len(body) > 4096 {
 		return fmt.Errorf("response to %q would include payload of %d bytes, exceeds max 4096", resp.respurl, len(body))
 	}
-	hreq, err := http.NewRequestWithContext(resp.Ctx, "POST", resp.respurl, bytes.NewReader(body))
+	hreq, err := http.NewRequestWithContext(resp.Ctx, "PUT", resp.respurl, bytes.NewReader(body))
 	if err != nil {
 		return fmt.Errorf("could not build request object for http callback to %q: %w", resp.respurl, err)
 	}
