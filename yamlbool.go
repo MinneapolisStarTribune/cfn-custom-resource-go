@@ -8,8 +8,8 @@ import "fmt"
 // refuses to parse into a bool. In your attribute types, use YAMLBool.
 type YAMLBool bool
 
-// TextUnmarshal implements TextUnmarshaler to satisfy json.Unmarshal.
-func (yb *YAMLBool) TextUnmarshal(b []byte) error {
+// UnmarshalText implements TextUnmarshaler to satisfy json.Unmarshal.
+func (yb *YAMLBool) UnmarshalText(b []byte) error {
 	switch string(b) {
 	case "y", "Y", "yes", "Yes", "YES", "true", "True", "TRUE", "on", "On", "ON":
 		*yb = true
