@@ -40,13 +40,7 @@ type Request struct {
 // You must provide a random source. This may be:
 //
 //	x := r.RandomPhysicalId(rand.New(rand.NewSource(time.Now().UnixNano())))
-//
-// RandomPhysicalId must only be called on a Create request. For other
-// request types, use the physical id provided in the Request.
 func (req *Request) RandomPhysicalId(src *rand.Rand) string {
-	if req.RequestType != "Create" {
-		panic("generating random physical id on a non-create request")
-	}
 	const chars = "zxcvbnmasdfghjklqwertyuiop1234567890ZXCVBNMASDFGHJKLQWERTYUIOP"
 	suffix := make([]byte, 30)
 	for j := range suffix {
