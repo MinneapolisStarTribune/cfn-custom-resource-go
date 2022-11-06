@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"os"
 )
 
 // Request represents a CloudFormation request object.
@@ -54,6 +55,7 @@ func (req *Request) RandomPhysicalId(src *rand.Rand) string {
 // stack rollback. A reason must be provided; err.Error() is a good
 // place to start.
 func (req *Request) FailureResponse(reason string) *Response {
+	fmt.Fprintln(os.Stderr, "returning a failure response", reason)
 	resp := baseResponse(req)
 	resp.Status = "FAILED"
 	resp.Reason = reason
@@ -133,6 +135,7 @@ func (req *Request) Try(f ReqHandler) (err error) {
 	// and sends a cfn failure response
 	defer func() {
 		if err != nil {
+			fmt.Fprintln(os.Stderr, "Try() completed with non-nil error", err)
 			if req.responseSent {
 				// if a response was already created, just capture and return
 				err = fmt.Errorf("received error but response already sent: %w", err)
