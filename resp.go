@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -70,6 +71,9 @@ type Response struct {
 
 	respurl string
 	sent    *bool
+
+	simulate        bool
+	simulatedOutput io.Writer
 }
 
 func baseResponse(req *Request) *Response {
@@ -88,6 +92,8 @@ func baseResponse(req *Request) *Response {
 		respurl:            req.ResponseURL,        // used internally
 		sent:               &req.responseSent,      // used internally
 		Ctx:                req.Ctx,                // used internally
+		simulate:           req.simulate,           // used internally for simulation
+		simulatedOutput:    req.simulatedOutput,    // used internally for simulation
 	}
 }
 
@@ -139,6 +145,14 @@ func (resp *Response) Send() error {
 	}
 	if len(body) > 4096 {
 		return fmt.Errorf("response to %q would include payload of %d bytes, exceeds max 4096", resp.respurl, len(body))
+	}
+
+	if resp.simulate {
+		if resp.simulatedOutput != nil {
+			fmt.Fprintf(resp.simulatedOutput, "Simulated response not sent\nResp: %+v\nAs JSON: %q\n", resp, body)
+		}
+		*resp.sent = true
+		return nil
 	}
 	hreq, err := http.NewRequestWithContext(resp.Ctx, "PUT", resp.respurl, bytes.NewReader(body))
 	if err != nil {

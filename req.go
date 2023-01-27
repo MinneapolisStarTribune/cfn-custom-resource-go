@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math/rand"
 	"os"
 )
@@ -31,6 +32,25 @@ type Request struct {
 	Ctx context.Context `json:"-"`
 
 	responseSent bool
+
+	simulate        bool
+	simulatedOutput io.Writer
+}
+
+// SimulatedRequest returns a Request that will not attempt to send a
+// real response to CloudFormation. reqtype must be one of "Create",
+// "Update", or "Delete". log is an optional Writer that will receive
+// one or more Write calls (via fmt.Fprintf) with the result that
+// would have been sent to CloudFormation. log may be nil.
+func SimulatedRequest(reqtype string, log io.Writer) *Request {
+	if reqtype != "Create" && reqtype != "Update" && reqtype != "Delete" {
+		panic(fmt.Sprintf(`invalid simulated request type %q; must be "Create", "Update", or "Delete"`, reqtype))
+	}
+	return &Request{
+		RequestType:     reqtype,
+		simulate:        true,
+		simulatedOutput: log,
+	}
 }
 
 // RandomPhysicalId returns a string suitable for using as a physical id
